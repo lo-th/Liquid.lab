@@ -1,7 +1,5 @@
 function Test_Truck() {
-    camera.position.y = 0;
-    camera.position.z = 20;
-
+    camera.position.set(0,0,20);
     world.SetGravity(new b2Vec2(0, -10));
 
     this.ground = world.add({ 
@@ -14,18 +12,10 @@ function Test_Truck() {
 
     this.input = {up:false, down:false, left:false, right:false};
 
-
     this.truck = new Truck(new b2Vec2(0, 2));
-    //this.w1 = new Wheel(new b2Vec2(2.8, 1));
-    //this.w2 = new Wheel(new b2Vec2(-2.8, 1));
-
-  
-
-
 }
 
 Test_Truck.prototype.Keyboard = function(char, code) {
-    //console.log(code)
     switch (code) {
         case 90:case 87:case 38: this.input.up = true; break;
         case 83:case 40: this.input.down = true; break;
@@ -46,10 +36,9 @@ Test_Truck.prototype.KeyboardUp = function(char, code) {
 Test_Truck.prototype.Step = function() {
 
     this.truck.update(this.input);
-
     world.Step(1/60, 8, 3);
-}
 
+}
 
 function Truck(pos){
     this.chassis = world.add({
@@ -86,10 +75,6 @@ function Truck(pos){
         axis : this.wheelF.body.GetPosition(),
         angle: new b2Vec2(0, 1)
     });
-
-    console.log(this.chassis);//.SetMassData().center)
-    
-
 }
 
 Truck.prototype = {
@@ -109,8 +94,6 @@ function Wheel(pos){
         groupIndex : 0 
     });
 
-    
-
     this.part = [];
     var n = 18;
     var distance = 1.2;
@@ -120,7 +103,6 @@ function Wheel(pos){
     for(var i=0; i<n; i++){
 
         var r = rad1*i;
-
         var angle = b2Vec2.orbite(r, distance);
         var axis = b2Vec2.orbite(r-rad2, distance, pos);
         var axisend = b2Vec2.orbite((r+rad1)-rad2, distance, pos);
