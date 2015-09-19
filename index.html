@@ -27,8 +27,9 @@
 
 </head><body>
 <canvas id="canvas"></canvas>
-
-<script> 
+<img style="position: absolute; top: 0; right: 0; border: 0;" src="textures/ribbon.png"></a>
+<a id="ribbon" href="https://github.com/lo-th/Liquid.lab"></a>
+<script>
 
 var canvas = document.getElementById( 'canvas' );
 canvas.oncontextmenu = function(e){ e.preventDefault(); };
@@ -79,7 +80,7 @@ var particleColors = [
 
 var world = null;
 
-var renderer, renderer2,camera, scene, blobEffect, baseGroup, extraGroup;
+var renderer,camera, scene, blobEffect, baseGroup, extraGroup;
 var vsize = {w:window.innerWidth, h:window.innerHeight}
 var particlesCloud;
 var liquidRender;
@@ -107,7 +108,6 @@ function init() {
 
     try {
         renderer = new THREE.WebGLRenderer({canvas:canvas, precision:"mediump", antialias: true,  alpha: true });
-        renderer2 = new THREE.WebGLRenderer({canvas:canvas, precision:"mediump", antialias: true,  alpha: true });
     } catch( error ) {
         printErrorMsg('<p>Sorry, your browser does not support WebGL.</p>'
                     + '<p>This testbed application uses WebGL to quickly draw'
@@ -122,10 +122,6 @@ function init() {
     renderer.setClearColor(0x000000, 0);
     renderer.setSize(w, window.innerHeight);
     renderer.autoClear = false;
-
-    renderer2.setClearColor(0x000000, 0);
-    renderer2.setSize(w, window.innerHeight);
-    renderer2.autoClear = false;
 
     camera.position.x = 0;
     camera.position.y = 0;
