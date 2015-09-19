@@ -14,7 +14,7 @@ function LiquidRender() {
 
 
     this.circleVertices = [];
-    this.circleResolution = 12; //12;
+    this.circleResolution = 12;
     this.initCircleVertices(this.circleVertices, this.circleResolution);
 
     this.jointVertices = [];
@@ -352,8 +352,9 @@ function ExtraParticle(){
     //particleMaterial.uniforms.usemap.value = true;
 
     particlesCloud = new THREE.Points( this.geometry, particleMaterial );
-    particlesCloud.position.set(0,0,0.01);
+    //particlesCloud.position.set(0,0,0.01);
     particlesCloud.frustumCulled = false;
+    particlesCloud.sortParticles = false;
     extraGroup.add( particlesCloud );
 }
 

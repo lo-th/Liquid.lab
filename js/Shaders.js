@@ -28,14 +28,14 @@ var CloudBasic = {
         'void main(){',
         '    col = colors*0.003921569;',
         '    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
-        '    float invsize = size*0.16;',
+        '    float invsize = size;',
         '    gl_PointSize = invsize * ( scale / length( mvPosition.xyz ) );',
         '    gl_Position = projectionMatrix * mvPosition;',
         '}'
     ].join('\n'),
-    depthTest: false,
-    depthWrite: true,
-    transparent: true
+    
+    
+    transparent:true, depthWrite:false, depthTest:false,
 };
 
 var CloudGausXY = {
@@ -111,9 +111,16 @@ var BlobShader = {
         reflectionFactor: { type:'f', value: 0.6 },
         refractionRatio: { type:'f', value: 0.98 },
 
-        rimPower:    { type:'f', value: 0.011 },
+        rimPower:    { type:'f', value: 0.5 },
         rimEdge:     { type:'f', value: 0.9 },
-        //rimColor:    { type:'c', value: new THREE.Color(0xFF3436) },
+        rimColor:    { type:'c', value: new THREE.Color(0xCCCCCC) },
+
+        useLight :   { type:'i', value: 1 },
+        lightColor:  { type:'c', value: new THREE.Color(0x404040) },
+        lightOrbit:  { type:'v3', value: new THREE.Vector3(-45,45,60)},
+        lightAnim :  { type:'v2', value: new THREE.Vector2(0.0,0.0) },
+        amplitude:   { type:'f', value: 0 },
+        
     },
     fragmentShader: [
         'uniform sampler2D mapXY;',
@@ -128,7 +135,15 @@ var BlobShader = {
 
         'uniform float rimPower;',
         'uniform float rimEdge;',
-        //'uniform vec3 rimColor;',
+        'uniform vec3 rimColor;',
+
+        'uniform int useLight;',
+        'uniform vec3 lightColor;',
+        'uniform vec3 lightOrbit;',
+        'uniform vec2 lightAnim;',
+        'uniform float amplitude;',
+
+        'const float Pi = 3.1415926;',
 
         
 
@@ -164,8 +179,8 @@ var BlobShader = {
 
 
 
-        //'    vec4 txt = texture2D(mapping, vUv);',
-        '    vec4 txt = blurred(mapping, vUv, b);',
+        '    vec4 txt = texture2D(mapping, vUv);',
+        //'    vec4 txt = blurred(mapping, vUv, b);',
 
         //'    vec4 texel = texture2D(mapXY, vUv);',
         //'    vec4 texelMin = texture2D(mapMin, vUv);',
@@ -174,7 +189,7 @@ var BlobShader = {
         '    vec4 texel = blurred(mapXY, vUv, b);',
         
 
-         
+/*         
         '    vec3 finNorm = vec3(0.0,0.0,0.0);',
         '    finNorm.xy = texel.xy - texelMin.xy;',
         '    finNorm.xy /= texel.z;',
@@ -184,8 +199,8 @@ var BlobShader = {
         '    finNorm *= a;',
         '    finNorm = normalize(finNorm);',
         '    a = float(finNorm.z>0.2110252);',
-        
-/*
+ */       
+
         '    vec3 finNorm;',
         '    finNorm.xy = texel.xy - texelMin.xy;',
         '    finNorm.xy /= texel.z;',
@@ -200,7 +215,7 @@ var BlobShader = {
         '    float aa = sm(0.2110252-delta, 0.2110252, dist);',
         '    a = 0.0;',
         '    if(finNorm.z>0.2) a = aa;',
-*/
+
         '    vec3 viewDirScreen = normalize( vec3( (vUv.x*2.0-1.0), (vUv.y*2.0-1.0)/r, -3.4) );',
         '    vec3 viewDirScreen2 = (vec3(vUv.x, vUv.y, -1.0));',
 
@@ -210,15 +225,40 @@ var BlobShader = {
 
 
 
-        '    vec4 dif = vec4(finNorm, a);',
-        //'    vec4 dif = vec4(txt.xyz, a);',
+        //'    vec4 dif = vec4(finNorm, a);',
+        '    vec4 dif = txt;',///vec4(txt.xyz, txt.a);',
 
-        /*'    if( rimPower > 0.0 ) {',
-        '        vec3 rimcolor = dif.xyz+vec3(0.5,0.5,0.5);',
+        '    if( useLight == 1 ) {',
+        '        float anim = amplitude * 1.0;',
+        '        vec3 lightPos = vec3(0.0);',
+
+        '        float phi = lightOrbit.x * Pi / 180.0;',
+        '        float theta = lightOrbit.y * Pi / 180.0;',
+
+        '        if(lightAnim.x==1.0)phi += anim;',
+        '        if(lightAnim.y==1.0)theta += anim;',
+
+        '        lightPos.x = (lightOrbit.z * sin(theta) * cos(phi));',
+        '        lightPos.z = (lightOrbit.z * cos(theta) * cos(phi));',
+        '        lightPos.y = (lightOrbit.z * sin(phi));',
+
+        '        lightPos = normalize(lightPos);',
+
+        '        float NdotL = clamp( dot(finNorm, lightPos ), 0.0, 1.0);',
+
+        '        vec3 h = normalize(vec3(viewDirScreen.xy, -viewDirScreen.z)+lightPos);',
+        '        float NdotH = clamp( dot(finNorm,h), 0.0, 1.0);',
+        '        NdotH = pow(NdotH,11.0);',
+
+        '        vec3 light = lightColor * NdotL*.5 + NdotH*.5;',
+        '        dif.xyz += light*a;',
+        '    }',
+
+        '    if( rimPower > 0.0 ) {',
         '        float f = rimEdge * abs( dot( finNorm, -viewDirScreen ) );',
         '        f = rimPower * ( 1. - sm( 0.0, 1., f ) );',
-        '        dif.xyz += rimcolor*f*a;',
-        '    }',*/
+        '        dif.xyz += rimColor*f*a;',
+        '    }',
 
         '    gl_FragColor = dif;',
         '}'
