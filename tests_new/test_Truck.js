@@ -2,6 +2,8 @@ function Test_Truck() {
     camera.position.set(0,0,20);
     world.SetGravity(new b2Vec2(0, -10));
 
+    tell('Use arrow keys or WS to move.');
+
     this.ground = world.add({ 
         shape: 'edge',
         p1: new b2Vec2(-100, -3), p2: new b2Vec2(100, -3),

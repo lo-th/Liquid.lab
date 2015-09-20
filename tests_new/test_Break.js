@@ -2,6 +2,8 @@ function Test_Break() {
 
     world.SetGravity(new b2Vec2(0, -1));
 
+    tell('Click on view to break object');
+
     camera.position.x = 3.2;
     camera.position.y = 2.4;
     camera.position.z = 10;

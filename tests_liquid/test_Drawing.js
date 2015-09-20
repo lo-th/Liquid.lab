@@ -2,6 +2,9 @@ function TestDrawingParticles() {
 
   camera.position.y = 2;
   camera.position.z = 3.2;
+
+  tell('Click on view to draw');
+
   var bd = new b2BodyDef;
   var ground = world.CreateBody(bd);
 

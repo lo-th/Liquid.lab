@@ -2,6 +2,8 @@ function Test_Moto() {
     camera.position.y = 0;
     camera.position.z = 10;
 
+    tell('Use arrow keys or WSAD to move | R : revers | E : eject.');
+
     this.ground = world.add({ 
         shape: 'edge',
         p1: new b2Vec2(-100, 0), p2: new b2Vec2(100, 0),

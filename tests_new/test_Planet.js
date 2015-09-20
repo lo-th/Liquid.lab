@@ -4,6 +4,8 @@ function Test_Planet() {
 
     world.SetGravity(new b2Vec2(0, 0));
 
+    tell('Click on view to add box');
+
     this.forceReducer = 0.005;
     this.orbite = 0;
 

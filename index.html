@@ -31,13 +31,28 @@
 <a id="ribbon" href="https://github.com/lo-th/Liquid.lab"></a>
 <script>
 
+var startTest = 'Moto';
+var startFolder = 'tests_new';
+
 var canvas = document.getElementById( 'canvas' );
 canvas.oncontextmenu = function(e){ e.preventDefault(); };
 canvas.ondrop = function(e) { e.preventDefault(); };
 
+var menu = document.createElement( 'div' );
+menu.className = 'menu';
+document.body.appendChild( menu );
+
+var title = document.createElement( 'div' );
+title.className = 'title';
+menu.appendChild( title );
+
+var subtitle = document.createElement( 'div' );
+subtitle.className = 'subtitle';
+menu.appendChild( subtitle );
+
+
 // code editor
 var editor = new CodeEditor(testSwitch);
-var startTest = 'Moto';
 
 // test list
 var newlist = ['Planet', 'Moto', 'Segway', 'Break', 'Truck'];
@@ -45,12 +60,13 @@ var liquidlist = ['DamBreak','Drawing','Elastic','Impulse','LiquidTimer','Partic
 var baselist = ['AddPair', 'AntiPointy', 'ApplyForce', 'BodyTypes', 'Breakable', 'Bridge', 'Bullet', 'Cantilever', 'Car', 'Chain', 'CharacterCollision', 'CollisionFiltering', 'CompoundShapes', 'Confined', 'ConvexHull', 'ConveyorBelt', 'CornerCase', 'Dominos',  'DumpShell', 'EdgeShape', 'EdgeTest',  'Faucet', 'Gears', 'Hw', 'Maxwell', 'Mobile', 'MobileBalanced', 'MotorJoint',  'Pinball', 'Pointy', 'Prismatic', 'Pulley', 'Pyramid', 'Ramp', 'Revolute',  'Rope', 'RopeJoint', 'SensorTest', 'ShapeEditing', 'SliderCrank', 'SphereStack',  'TheoJansen', 'Tiles', 'Tumbler', 'VaryingFriction', 'VaryingRestitution', 'VerticalStack',  'Web',
 ];
 
-var demoList = new UIL.List({target:document.body, callback:loadNew, name:' ', color:'no', size:100, list:newlist, pos:{left:'100%', top:'10px'}, simple:true, full:true, value:'ADVANCED' });
-var liquidList = new UIL.List({target:document.body, callback:loadLiquid, name:' ', color:'no', size:110, list:liquidlist, pos:{left:'100%', top:'10px'}, simple:true, full:false, value:'LIQUID' });
-var basicList = new UIL.List({target:document.body, callback:loadBase, name:' ', color:'no', size:130, list:baselist, pos:{left:'100%', top:'10px'}, simple:true, full:false, value:'BASIC' });
-function loadBase(name){ editor.load('tests_base/test_'+name+'.js'); basicList.text('BASIC'); }
-function loadNew(name){ editor.load('tests_new/test_'+name+'.js'); demoList.text('ADVANCED'); }
-function loadLiquid(name){ editor.load('tests_liquid/test_'+name+'.js'); liquidList.text('LIQUID'); }
+var demoList = new UIL.List({target:menu, callback:loadNew, name:' ', color:'no', size:100, list:newlist, pos:{left:'10px', top:'10px'}, simple:true, full:true, value:'ADVANCED' });
+var liquidList = new UIL.List({target:menu, callback:loadLiquid, name:' ', color:'no', size:110, list:liquidlist, pos:{left:'120px', top:'10px'}, simple:true, full:false, value:'LIQUID' });
+var basicList = new UIL.List({target:menu, callback:loadBase, name:' ', color:'no', size:130, list:baselist, pos:{left:'240px', top:'10px'}, simple:true, full:false, value:'BASIC' });
+
+function loadBase(name){startTest=name; startFolder = 'tests_base'; editor.load('tests_base/test_'+name+'.js'); basicList.text('BASIC'); }
+function loadNew(name){startTest=name; startFolder = 'tests_new';  editor.load('tests_new/test_'+name+'.js'); demoList.text('ADVANCED'); }
+function loadLiquid(name){startTest=name; startFolder = 'tests_liquid';  editor.load('tests_liquid/test_'+name+'.js'); liquidList.text('LIQUID'); }
 
 // middle drag view
 var dragView = false;
@@ -154,6 +170,8 @@ function init() {
 }
 
 function testSwitch(testName) {
+    location.hash = startTest;
+    title.innerHTML = startTest;
     ResetWorld();
     world.SetGravity(new b2Vec2(0, -9.81));
     var bd = new b2BodyDef;
@@ -161,7 +179,7 @@ function testSwitch(testName) {
     test = new window[testName];
 }
 
-function Testbed(obj) {
+function Testbed() {
     // Init world
     var that = this;
     document.addEventListener('keydown', function(e) {
@@ -252,11 +270,32 @@ function Testbed(obj) {
     window.addEventListener( 'resize', resize, false );
     resize();
 
+    
 
-    editor.load('tests_new/test_'+startTest+'.js');
+    var hash = location.hash.substr( 1 );
+
+    if(hash !==''){ 
+        console.log('yoooo',hash);
+        testLink(hash);
+    }
+
+    editor.load(startFolder+'/test_'+startTest+'.js');
 
     render();
 }
+
+var tell = function(string){
+    subtitle.innerHTML = string;
+}
+
+var testLink = function(name){
+    var i = newlist.length;
+    while(i--) if(newlist[i] === name){ startFolder = 'tests_new'; startTest=name; return;}
+    i = liquidlist.length;
+    while(i--) if(liquidlist[i] === name){ startFolder = 'tests_liquid'; startTest=name; return;}
+    i = baselist.length;
+    while(i--) if(baselist[i] === name){ startFolder = 'tests_base'; startTest=name; return;}
+};
 
 var render = function() {
     // bring objects into world
@@ -285,6 +324,7 @@ var render = function() {
 
     requestAnimationFrame(render);
 };
+
 var ClearForces = function() {
     if (world !== null) {
         var i;
@@ -305,6 +345,7 @@ var ClearForces = function() {
         //while (world.particleSystems.length > 0) { world.DestroyParticleSystem(world.particleSystems[0]); }
     }
 }
+
 var ResetWorld = function() {
     if (world !== null) {
         while (world.joints.length > 0) { world.DestroyJoint(world.joints[0]); }
@@ -312,6 +353,8 @@ var ResetWorld = function() {
         while (world.particleSystems.length > 0) { world.DestroyParticleSystem(world.particleSystems[0]); }
     }
     camera.position.set(0,10,20);
+    camera.lookAt(new THREE.Vector3(0,10,0));
+    tell('')
 };
 
 var Step = function() {
@@ -345,11 +388,8 @@ function resize() {
     vsize.h = window.innerHeight;
 
     editor.content.style.width =  (x-20)+'px';
-    demoList.c[0].style.left = (x+10) +'px';
-    liquidList.c[0].style.left = (x+120) +'px';
-    basicList.c[0].style.left = (x+240) +'px';
-
     separator.style.lineHeight = vsize.h+'px';
+    menu.style.left = (x+10) +'px';
 
     canvas.style.left = x +'px';
     camera.aspect = vsize.w / vsize.h;

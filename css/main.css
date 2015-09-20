@@ -28,6 +28,26 @@ body{
 
 canvas { position: absolute; top:0; left:50%; pointer-events:auto; width:50%; height:100%; }
 
+.menu{
+    position:absolute;
+    pointer-events:none;
+    height:100%;
+}
+
+.title{
+    position:absolute;
+    font-size: 16px;
+    left:10px;
+    bottom:30px;
+}
+.subtitle{
+    position:absolute;
+    left:10px;
+    bottom:10px;
+    width:300px;
+    height:20px;
+}
+
 #ribbon{
     position: absolute; top:-50px; right:48px;
     width:30px; height:200px; background:none; 
