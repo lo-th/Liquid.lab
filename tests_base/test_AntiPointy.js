@@ -42,7 +42,7 @@ TestAntiPointy.prototype.Step = function() {
   --this.maxParticlesToCreate;
 
   var pd = new b2ParticleDef();
-  pd.position.Set(RandomFloat(-10, 10), 40);
+  pd.position.Set(Math.rand(-10, 10), 40);
   pd.velocity.Set(0, -1);
   this.particleSystem.CreateParticle(pd);
 }

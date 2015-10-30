@@ -21,11 +21,11 @@ function TestCompoundShapes() {
     circle2.radius = 0.5;
     circle2.position.Set(0.5, 0.5);
 
-    var x = RandomFloat(-0.1, 0.1);
+    var x = Math.rand(-0.1, 0.1);
     bd = new b2BodyDef;
     bd.type = b2_dynamicBody;
     bd.position.Set(x + 5.0, 1.05 + 2.5 * i);
-    bd.angle = RandomFloat(-Math.PI, Math.PI);
+    bd.angle = Math.rand(-Math.PI, Math.PI);
     body = world.CreateBody(bd);
     body.CreateFixtureFromShape(circle1, 2.0);
     body.CreateFixtureFromShape(circle2, 0.0);
@@ -38,11 +38,11 @@ function TestCompoundShapes() {
     var polygon2 = new b2PolygonShape;
     polygon2.SetAsBoxXYCenterAngle(0.25, 0.5, new b2Vec2(0.0, -0.5), 0.5 * Math.PI);
 
-    x = RandomFloat(-0.1, 0.1);
+    x = Math.rand(-0.1, 0.1);
     bd = new b2BodyDef;
     bd.type = b2_dynamicBody;
     bd.position.Set(x - 5.0, 1.05 + 2.5 * i);
-    bd.angle = RandomFloat(-Math.PI, Math.PI);
+    bd.angle = Math.rand(-Math.PI, Math.PI);
     body = world.CreateBody(bd);
     body.CreateFixtureFromShape(polygon1, 2.0);
     body.CreateFixtureFromShape(polygon2, 2.0);
@@ -76,7 +76,7 @@ function TestCompoundShapes() {
     triangle2.vertices.push(new b2Vec2(vertex.x, vertex.y));
 
 
-    x = RandomFloat(-0.1, 0.1);
+    x = Math.rand(-0.1, 0.1);
     bd = new b2BodyDef;
     bd.type = b2_dynamicBody;
     bd.position.Set(x, 2.05 + 2.5 * i);

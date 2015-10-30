@@ -10,9 +10,7 @@ function LiquidRender() {
     this.positions = geometry.attributes.position.array;
     this.colors = geometry.attributes.color.array;
     this.currentVertex = 0;
-    //geometry.computeBoundingSphere();
     this.buffer = new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({ vertexColors: true }));
-    this.buffer.frustumCulled = false;
 
 
     this.circleVertices = [];
@@ -58,33 +56,63 @@ LiquidRender.prototype = {
         }
     },*/
     draw : function() {
-        var i, j;
+        var i, j, b;
         // draw rigidbody
+        //var bodyCount = world.GetBodyCount();
+        //var jointCount = world.GetJointCount();
+        //while(world.m_bodyList.m_next!==null){
         i = world.bodies.length;
         while(i--){
-            var body = world.bodies[i];
-            var transform = body.GetTransform();
-            j = body.fixtures.length;
-            while(j--) body.fixtures[j].shape.draw(transform);
+            b = world.bodies[i];
+            b.m_fixtureList.m_shape.draw(b.m_xf);
         }
+        //for (var b = world.m_bodyList; b; b = b.m_next){
+            //var transform = b.GetTransform();//m_out_xf;
+           // console.log(transform.p)
+            //console.log(b)
+            //var b = world.m_bodyList.m_next
+          //  b.m_fixtureList.m_shape.draw(b.m_xf);
+            //for (var f = b.m_fixtureList; f; f = b.m_fixtureList.m_next){
+               // console.log(f)
+             //   f.m_shape.draw(b.m_xf);
+            //}
+
+            //if(b.m_fixtureList) b.m_fixtureList.m_shape.draw(transform);
+            //j = b.fixtures.length;
+
+            //while(j--) b.fixtures[j].shape.draw(transform)
+        //}
+       // console.log(world.m_island.m_bodyCount)
+
+        //i = world.m_island.m_bodies.length;
+       /* for (i = 0; i < world.m_island.m_bodyCount; ++i){
+            var body = world.m_island.m_bodies[i];
+            var transform = body.GetTransform();
+            //j = body.fixtures.length;
+            //while(j--) body.fixtures[j].shape.draw(transform);
+            for (var f = body.m_fixtureList; f; f = body.m_fixtureList.m_next){
+               // console.log(f)
+                f.m_shape.draw(transform);
+            }
+        }*/
 
         
 
         // draw joints
-        i = world.joints.length;
+       /* i = world.joints.length;
         while(i--) this.drawJoint(world.joints[i]);
-
+*/
         this.collapseBuffer();
         this.buffer.geometry.attributes.position.needsUpdate = true;
         this.buffer.geometry.attributes.color.needsUpdate = true;
 
 
         // draw particle systems
-        i = world.particleSystems.length;
+      /*  i = world.particleSystems.length;
         while(i--) this.extra.draw(world.particleSystems[i]);
         //while(i--) drawParticleSystem(world.particleSystems[i]);
 
-        this.extra.update();
+        this.extra.update();*/
     },
     /*draw : function() {
         for (var i = 0, max = world.bodies.length; i < max; i++) {
@@ -177,8 +205,15 @@ LiquidRender.prototype = {
     },
     transformAndInsert : function(v1, v2, transform, r, g, b) {
         var transformedV1 = new b2Vec2(), transformedV2 = new b2Vec2();
-        b2Vec2.Mul(transformedV1, transform, v1);
+
+        //box2d.b2Mul(transform, v1, transformedV1);
+        //box2d.b2Mul(transform, v2, transformedV2);
+
+       b2Vec2.Mul(transformedV1, transform, v1);
         b2Vec2.Mul(transformedV2, transform, v2);
+
+       // box2d.b2Mul(transform, v1, transformedV1);
+       // box2d.b2Mul(transform, v2, transformedV2);
         this.insertLine(transformedV1.x, transformedV1.y, transformedV2.x, transformedV2.y, r, g, b);
     },
     transformVerticesAndInsert : function(vertices, transform, r, g, b) {
@@ -284,24 +319,24 @@ LiquidRender.prototype = {
 }
 
 b2CircleShape.prototype.draw = function(transform) {
-    var circlePosition = this.position, center = new b2Vec2(circlePosition.x, circlePosition.y);
+    var circlePosition = this.m_p, center = new b2Vec2(circlePosition.x, circlePosition.y);
     // b2Vec2.Mul(center, transform, center);
-    liquidRender.insertCircleVertices(transform, this.radius, center.x, center.y, 0, 1, 1);
+    liquidRender.insertCircleVertices(transform, this.m_radius, center.x, center.y, 0, 1, 1);
 };
 
 b2ChainShape.prototype.draw = function(transform) {
-    liquidRender.transformVerticesAndInsert(this.vertices, transform, 1, 0, 0);
+    liquidRender.transformVerticesAndInsert(this.m_vertices, transform, 1, 0, 0);
 };
 
 
 b2EdgeShape.prototype.draw = function(transform) {
-    liquidRender.transformAndInsert(this.vertex1, this.vertex2, transform, 0.5, 0.5, 0.5);
+    liquidRender.transformAndInsert(this.m_vertex1, this.m_vertex2, transform, 0.5, 0.5, 0.5);
 };
 
 b2PolygonShape.prototype.draw = function(transform) {
     var zPosition = liquidRender.currentVertex * 3;
 
-    liquidRender.transformVerticesAndInsert(this.vertices, transform, 1, 0.5, 0);
+    liquidRender.transformVerticesAndInsert(this.m_vertices, transform, 1, 0.5, 0);
 
     // create a loop
     var positions = liquidRender.positions;

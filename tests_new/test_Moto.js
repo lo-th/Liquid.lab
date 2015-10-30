@@ -1,16 +1,10 @@
 function Test_Moto() {
     camera.position.y = 0;
-    camera.position.z = 10;
+    camera.position.z = 15;
 
     tell('Use arrow keys or WSAD to move | R : revers | E : eject.');
 
-    this.ground = world.add({ 
-        shape: 'edge',
-        p1: new b2Vec2(-100, 0), p2: new b2Vec2(100, 0),
-        density: 1, friction: 1, restitution:1.2,
-        groupIndex : -2,
-        type: 'static', userData: Constants.ID['ground']
-    });
+    this.ground = new Hill({dy:1, w:200, h:-10, step:2, size:20, zone:50, friction: 1, restitution:1.2, userData: Constants.ID['ground']});
 
     this.input = {up:false, down:false, left:false, right:false};
 
@@ -75,6 +69,8 @@ Test_Moto.prototype.Step = function() {
         }else{
             this.onImput();
             this.moto.move(this.input);
+            this.ground.update(this.moto.position.x);
+            follow(this.moto.position);
         }
         
     }
@@ -115,6 +111,8 @@ function Moto(world, mirror) {
     this.mirror = mirror ? -1 : 1;
     this.rider = new Rider(world, this);
     this.dead = false;
+
+    this.position = null;
 
     this.player_start = new b2Vec2(0, 0);
 
@@ -157,6 +155,8 @@ Moto.prototype = {
         this.left_prismatic_joint = this.create_prismatic_joint(this.left_axle, Constants.left_suspension);
         this.right_prismatic_joint = this.create_prismatic_joint(this.right_axle, Constants.right_suspension);
 
+        console.log(this.right_prismatic_joint)
+
         this.rider.mirror = this.mirror;
         this.rider.init(direct);
         this.isDestroy = false;
@@ -190,6 +190,8 @@ Moto.prototype = {
         } else if (this.left_wheel.GetAngularVelocity() < -Constants.max_moto_speed) {
             this.left_wheel.SetAngularVelocity(-Constants.max_moto_speed);
         }
+
+        this.position = this.getPosition();//body.GetWorldCenter();
 
     },
     changeRight: function(){
@@ -245,6 +247,7 @@ Moto.prototype = {
             bodyA: axle, bodyB: wheel,
             axis: wheel.GetWorldCenter()
         });
+
     },
     create_prismatic_joint : function(axle, cst) {
         return world.addJoint({ 

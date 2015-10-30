@@ -15,8 +15,8 @@ function TestAddPair() {
       var circle = new b2CircleShape();
       circle.position.Set(0, 0);
       circle.radius = 0.1;
-      var px = RandomFloat(minX, maxX);
-      var py = RandomFloat(minY, maxY);
+      var px = Math.rand(minX, maxX);
+      var py = Math.rand(minY, maxY);
       bodyDef.position.Set(px, py);
       var body = world.CreateBody(bodyDef);
       body.CreateFixtureFromShape(circle, 0.01);

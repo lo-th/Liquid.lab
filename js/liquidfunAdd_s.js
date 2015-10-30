@@ -47,11 +47,8 @@ b2Vec2.orbite = function(angle, radius, pos){
 };
 
 
-
-
-
 // BODY CREATOR
-
+/*
 b2World.prototype.add = function(obj){
     obj = obj || {};   
     var body = this.CreateBody( this.addBodyDef(obj) );
@@ -114,14 +111,6 @@ b2World.prototype.addShape = function(obj){
             var dx = obj.mx || 0;
             var dy = obj.my || 0;
             for(var i=0; i<len; i+=2){ shape.vertices.push( new b2Vec2( obj.vertices[i]+dx, obj.vertices[i+1]+dy )); } 
-        break;
-        case 'chaine': 
-            shape = new b2ChainShape; 
-            var len = obj.vertices.length;
-            var dx = obj.mx || 0;
-            var dy = obj.my || 0;
-            for(var i=0; i<len; i+=2){ shape.vertices.push( new b2Vec2( obj.vertices[i]+dx, obj.vertices[i+1]+dy )); } 
-            if(obj.close) shape.CreateLoop(); 
         break;
         case 'box': 
             shape = new b2PolygonShape; 
@@ -218,68 +207,4 @@ b2WheelJoint.prototype.def = null;
 b2PrismaticJoint.prototype.type = 'prismatic';
 b2PrismaticJoint.prototype.def = null;
 b2PrismaticJoint.prototype.angle = null;
-b2PrismaticJoint.prototype.axis = null;
-
-
-
-// HILL CREATOR
-
-var Hill = function(o){
-    o = o || {}
-    this.x = 0;
-    this.y = 0;
-
-    this.zone = o.zone || 100;
-
-    this.w = o.w || 400;
-    this.h = o.h || -25;
-    this.s = o.size || 6;//10;
-    this.n = o.step || 10;
-
-    this.dx = -this.w*0.5;
-    this.dy = o.dy || 0;
-
-
-    this.terrain = new Terrain2D(this.w, this.h, this.s, this.n);
-
-    this.obj = { 
-        shape: 'chaine',
-        mx:this.dx,
-        my:this.dy,
-        vertices:this.terrain.gen(this.x, this.y),
-        density: 0, friction: o.friction || 1, restitution: o.restitution || 1.2,
-        groupIndex : o.groupIndex || 0,
-        type: 'static',
-        userData:o.userData || null
-    }
-
-    this.ground = world.add(this.obj);
-
-    //console.log(this.ground)
-
-}
-
-Hill.prototype = {
-    update:function(x){
-        if(x>(this.x*this.n)+this.zone){ 
-            this.obj.mx += this.zone;
-            this.move(this.zone/this.n);
-        }
-        if(x<(this.x*this.n)-this.zone){ 
-            this.obj.mx -= this.zone;
-            this.move(-this.zone/this.n);
-        }
-
-    },
-    move:function(x,y){
-        this.x += x || 0;
-        this.y += y || 0;
-        this.obj.vertices = this.terrain.gen(this.x, this.y);
-
-        // update fixture
-        this.ground.DestroyFixture(this.ground.fixtures[0]);
-        this.ground.CreateFixtureFromDef(world.addFixture(this.obj));
-
-    }
-
-}
+b2PrismaticJoint.prototype.axis = null;*/

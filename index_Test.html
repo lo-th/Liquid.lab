@@ -20,13 +20,10 @@
 <script src="js/three.min.js"></script>
 <script src="js/Shaders.js"></script>
 <script src="js/blobShaders.js"></script>
-<script src="js/liquidfun.js"></script>
-<!--<script src="js/b2AreaJoint.js"></script>-->
-<script src="js/liquidfunAdd.js"></script>
-<script src="js/LiquidRender.js"></script>
+<script src="js/b2d.js"></script>
+<script src="js/liquidfunAdd_s.js"></script>
+<script src="js/LiquidRender_s.js"></script>
 <script src="js/uil.min.js"></script>
-<script src="js/Terrain2D.js"></script>
-<script src="js/gamepad.js"></script>
 
 </head><body>
 <canvas id="canvas"></canvas>
@@ -34,7 +31,7 @@
 <a id="ribbon" href="https://github.com/lo-th/Liquid.lab"></a>
 <script>
 
-var startTest = 'Moto';
+var startTest = 'Blob';
 var startFolder = 'tests_new';
 
 var canvas = document.getElementById( 'canvas' );
@@ -58,7 +55,7 @@ menu.appendChild( subtitle );
 var editor = new CodeEditor(testSwitch);
 
 // test list
-var newlist = ['Planet', 'Moto', 'Segway', 'Break', 'Truck'];
+var newlist = ['Planet', 'Moto', 'Segway', 'Break', 'Truck', 'Blob'];
 var liquidlist = ['DamBreak','Drawing','Elastic','Impulse','LiquidTimer','Particles','RigidParticles','Soup', 'SoupStirrer','Sparky','SurfaceTension','WaveMachine'];
 var baselist = ['AddPair', 'AntiPointy', 'ApplyForce', 'BodyTypes', 'Breakable', 'Bridge', 'Bullet', 'Cantilever', 'Car', 'Chain', 'CharacterCollision', 'CollisionFiltering', 'CompoundShapes', 'Confined', 'ConvexHull', 'ConveyorBelt', 'CornerCase', 'Dominos',  'DumpShell', 'EdgeShape', 'EdgeTest',  'Faucet', 'Gears', 'Hw', 'Maxwell', 'Mobile', 'MobileBalanced', 'MotorJoint',  'Pinball', 'Pointy', 'Prismatic', 'Pulley', 'Pyramid', 'Ramp', 'Revolute',  'Rope', 'RopeJoint', 'SensorTest', 'ShapeEditing', 'SliderCrank', 'SphereStack',  'TheoJansen', 'Tiles', 'Tumbler', 'VaryingFriction', 'VaryingRestitution', 'VerticalStack',  'Web',
 ];
@@ -99,7 +96,7 @@ var particleColors = [
 
 var world = null;
 
-var renderer, camera, target, scene, blobEffect, baseGroup, extraGroup;
+var renderer,camera, scene, blobEffect, baseGroup, extraGroup;
 var vsize = {w:window.innerWidth, h:window.innerHeight}
 var particlesCloud;
 var liquidRender;
@@ -124,8 +121,6 @@ function init() {
     var w = window.innerWidth/2;
 
     camera = new THREE.PerspectiveCamera(70 , w / window.innerHeight , 1, 10000);
-    target = new THREE.Vector3();
-
 
     try {
         renderer = new THREE.WebGLRenderer({canvas:canvas, precision:"mediump", antialias: true,  alpha: true });
@@ -151,10 +146,7 @@ function init() {
     scene.add(baseGroup);
     scene.add(extraGroup);
 
-    //camera.lookAt(scene.position);
-    target.copy(scene.position);
-    camera.lookAt(target);
-
+    camera.lookAt(scene.position);
 
     blobEffect = new BlobEffect();
 
@@ -163,7 +155,7 @@ function init() {
     // hack
     liquidRender = new LiquidRender();
     var gravity = new b2Vec2(0, -10);
-    world = new b2World(gravity, true);
+    world = new b2World(gravity);
 
 
     
@@ -177,16 +169,16 @@ function testSwitch(testName) {
     location.hash = startTest;
     title.innerHTML = startTest;
     ResetWorld();
-    world.SetGravity(new b2Vec2(0, -9.81));
+    /*world.SetGravity(new b2Vec2(0, -9.81));
     var bd = new b2BodyDef;
-    g_groundBody = world.CreateBody(bd);
+    g_groundBody = world.CreateBody(bd);*/
     test = new window[testName];
 }
 
 function Testbed() {
     // Init world
     var that = this;
-    document.addEventListener('keydown', function(e) {
+    /*document.addEventListener('keydown', function(e) {
         if(editor.isFocus) return;
         e.preventDefault();
         if(test.Keyboard !== undefined) test.Keyboard( String.fromCharCode(e.which || e.keyCode), e.which || e.keyCode );
@@ -235,10 +227,7 @@ function Testbed() {
     });
 
     canvas.addEventListener('mousemove', function(e) {
-        /*if(dragView){
-            separator.style.left = (e.clientX-10)+'px';
-            resize();
-        } else {*/
+     
             var p = getMouseCoords(e);
             if (that.mouseJoint){ 
                 that.mouseJoint.SetTarget(p);
@@ -261,7 +250,7 @@ function Testbed() {
         }
         if (test.MouseUp !== undefined) test.MouseUp(getMouseCoords(e));
         
-    });
+    });*/
 
 
     window.addEventListener( 'resize', resize, false );
@@ -283,12 +272,6 @@ function Testbed() {
 
 var tell = function(string){
     subtitle.innerHTML = string;
-}
-
-var follow = function(pos){
-    var z = camera.position.z;
-    camera.position.set(pos.x, pos.y, z);
-    //target.set(pos.x, pos.y,0);
 }
 
 var testLink = function(name){
@@ -328,12 +311,12 @@ var render = function() {
     requestAnimationFrame(render);
 };
 
-var ClearForces = function() {
+/*var ClearForces = function() {
     if (world !== null) {
         var i;
 
-       /* i = world.joints.length;
-        while ( i--) { if(world.joints[i].SetMotorSpeed) world.joints[i].SetMotorSpeed(0); }*/
+        i = world.joints.length;
+        while ( i--) { if(world.joints[i].SetMotorSpeed) world.joints[i].SetMotorSpeed(0); }
         i = world.bodies.length
         var direction = new b2Vec2();
         while ( i-- ) {//GetWorldCenter()
@@ -347,16 +330,16 @@ var ClearForces = function() {
         }
         //while (world.particleSystems.length > 0) { world.DestroyParticleSystem(world.particleSystems[0]); }
     }
-}
+}*/
 
 var ResetWorld = function() {
-    if (world !== null) {
+   /* if (world !== null) {
         while (world.joints.length > 0) { world.DestroyJoint(world.joints[0]); }
         while (world.bodies.length > 0) { world.DestroyBody(world.bodies[0]); }
         while (world.particleSystems.length > 0) { world.DestroyParticleSystem(world.particleSystems[0]); }
-    }
-    camera.position.set(0,10,20);
-    camera.lookAt(new THREE.Vector3(0,10,0));
+    }*/
+    camera.position.set(0,0,20);
+    camera.lookAt(new THREE.Vector3(0,0,0));
     tell('');
 };
 

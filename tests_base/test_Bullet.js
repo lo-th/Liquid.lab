@@ -40,7 +40,7 @@ TestBullet.prototype.Step = function() {
     this.body.SetLinearVelocity(new b2Vec2(0, 0));
     this.body.SetAngularVelocity(0);
 
-    var x = RandomFloat(-1.0, 1.0);
+    var x = Math.rand(-1.0, 1.0);
     this.bullet.SetTransform(new b2Vec2(x, 10), 0);
     this.bullet.SetLinearVelocity(new b2Vec2(0, -50));
     this.bullet.SetAngularVelocity(0);
