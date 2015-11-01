@@ -2,13 +2,19 @@ function Test_Segway() {
 
     camera.position.set(0,2,20);
 
+    this.ph = 6;
+
+    this.position = new b2Vec2();
+
     world.SetGravity(new b2Vec2(0, -30));
 
-    this.ground = world.add({ 
+    this.ground = new Hill({dy:1, w:200, h:-5, step:2, size:20, zone:50, friction: 1, restitution:0.2, userData:1 });
+
+    /*this.ground = world.add({ 
         shape: 'edge',
         p1: new b2Vec2(-100, 0), p2: new b2Vec2(100, 0),
         density: 1, friction: 1, type: 'static', userData: 1
-    });
+    });*/
 
     // move bodys
 
@@ -25,7 +31,7 @@ function Test_Segway() {
     });
 
     this.pendulumBody = world.add({ 
-        shape: 'box', w: 1, h: 10, x: 0, y: 2 + 0.5 * 10,
+        shape: 'box', w: 1, h: this.ph, x: 0, y: 2 + 0.5 * this.ph,
         density: 1, friction: 1, groupIndex: -1,
         allowSleep:false
     });
@@ -43,7 +49,7 @@ function Test_Segway() {
     this.pendulumJoint = world.addJoint({ 
         type:'revolute', visible: false,
         bodyA: this.carBody, bodyB: this.pendulumBody,
-        axis: new b2Vec2(0,2), localAnchorB: new b2Vec2(0, -0.5 * 10),
+        axis: new b2Vec2(0,2), localAnchorB: new b2Vec2(0, -0.5 * this.ph),
         enableMotor: true
     });
 
@@ -66,11 +72,20 @@ function Test_Segway() {
 
 }
 
+Test_Segway.prototype.Step = function() {
+    world.Step(1/60, 10, 10);
+    this.ground.update(this.position.x);
+    follow(this.position);
+}
+
 Test_Segway.prototype.changeTargetPos = function() {  
     this.targetPosition = this.targetPosition===0 ? 10 : 0;
 }
 
 Test_Segway.prototype.PreSolve = function(contact, oldManifold) {
+
+    this.position.x = this.pendulumBody.GetPosition().x;
+
     var a = contact.GetFixtureA().body.GetUserData();
     var b = contact.GetFixtureB().body.GetUserData()
 
@@ -80,7 +95,7 @@ Test_Segway.prototype.PreSolve = function(contact, oldManifold) {
 
     var targetAngle = 0;
     if ( groundContact ) {
-        this.posAvg = 0.95 * this.posAvg + 0.05 * this.pendulumBody.GetPosition().x;
+        this.posAvg = 0.95 * this.posAvg + 0.05 * this.position.x;
         this.positionController.currentError = this.targetPosition - this.posAvg;
         this.positionController.step(this.lastTimeStep);
         var targetLinAccel = this.positionController.output;
@@ -120,4 +135,6 @@ PIDController.prototype.step = function(dt) {
     var derivative = (1 / dt) * (this.currentError - this.previousError);
     this.output = this.gainP * this.currentError + this.gainI * this.integral + this.gainD * derivative;
     this.previousError = this.currentError;
+
+   
 };       

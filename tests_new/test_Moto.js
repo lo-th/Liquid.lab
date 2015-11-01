@@ -2,11 +2,11 @@ function Test_Moto() {
     camera.position.y = 0;
     camera.position.z = 15;
 
-    tell('Use arrow keys or WSAD to move | R : revers | E : eject.');
+    tell('Use arrow keys or WSAD to move <br>R: revers | E: eject | Space: restart.');
 
     this.ground = new Hill({dy:1, w:200, h:-10, step:2, size:20, zone:50, friction: 1, restitution:1.2, userData: Constants.ID['ground']});
 
-    this.input = {up:false, down:false, left:false, right:false};
+    this.input = { up:0, down:0, left:0, right:0 };
 
     this.moto = new Moto(world);
     this.needKill = false;
@@ -32,11 +32,11 @@ Test_Moto.prototype.BeginContactBody = function(contact) {
     var a = contact.GetFixtureA().body.GetUserData();
     var b = contact.GetFixtureB().body.GetUserData();
 
-        if (!Constants.hooking) {
-            this.needKill = this.contactList(a,b,['head', 'torso', 'upper_leg', 'lower_arm', 'upper_arm'], 'ground');
-        } else {
-            this.needKill = this.contact(a, b, 'head', 'ground');
-        }
+    if (!Constants.hooking) {
+        this.needKill = this.contactList(a,b,['head', 'torso', 'upper_leg', 'lower_arm', 'upper_arm'], 'ground');
+    } else {
+        this.needKill = this.contact(a, b, 'head', 'ground');
+    }
 };
 
 Test_Moto.prototype.onImput = function() {
@@ -44,9 +44,10 @@ Test_Moto.prototype.onImput = function() {
     mirror = this.moto.mirror;
     moto_acceleration = Constants.moto_acceleration;
     biker_force = Constants.biker_force;
-    //if (!this.moto.dead) {
+
+    if (!this.moto.isDead) {
         if (this.input.up) {
-          this.moto.left_wheel.ApplyTorque(-this.moto.mirror * moto_acceleration);
+            this.moto.left_wheel.ApplyTorque(-this.moto.mirror * moto_acceleration);
         }
         if (this.input.down) {
             this.moto.right_wheel.SetAngularVelocity(0);
@@ -59,11 +60,11 @@ Test_Moto.prototype.onImput = function() {
             biker_force = -biker_force * 0.8;
             this.moto.wheeling(biker_force);
         }
-    //}
+    }
 }
 
 Test_Moto.prototype.Step = function() {
-    if(!this.moto.isDestroy && !this.moto.dead){
+    if(!this.moto.isDestroy && !this.moto.isDead){
         if(this.needKill){
             this.moto.kill();
         }else{
@@ -73,6 +74,8 @@ Test_Moto.prototype.Step = function() {
             follow(this.moto.position);
         }
         
+    } else {
+        follow(this.moto.rider.torso.GetWorldCenter());
     }
     world.Step(1/60, 10, 10);
 }
@@ -80,21 +83,22 @@ Test_Moto.prototype.Step = function() {
 Test_Moto.prototype.Keyboard = function(char, code) {
     //console.log(code)
     switch (code) {
-        case 90:case 87:case 38: this.input.up = true; break;
-        case 83:case 40: this.input.down = true; break;
-        case 81:case 65:case 37: this.input.left = true; break;
-        case 68:case 39: this.input.right = true; break;
+        case 90:case 87:case 38: this.input.up = 1; break;
+        case 83:case 40: this.input.down = 1; break;
+        case 81:case 65:case 37: this.input.left = 1; break;
+        case 68:case 39: this.input.right = 1; break;
         case 69: this.moto.rider.eject(); break;
         case 82: this.moto.flip(); break;
+        case 32: this.moto.restart(this.ground); break;
     }
 };
 
 Test_Moto.prototype.KeyboardUp = function(char, code) {
     switch (code) {
-        case 90:case 87:case 38: this.input.up = false; break;
-        case 83:case 40: this.input.down = false; break;
-        case 81:case 65:case 37: this.input.left = false; break;
-        case 68:case 39: this.input.right = false; break;
+        case 90:case 87:case 38: this.input.up = 0; break;
+        case 83:case 40: this.input.down = 0; break;
+        case 81:case 65:case 37: this.input.left = 0; break;
+        case 68:case 39: this.input.right = 0; break;
     }
 };
 
@@ -110,25 +114,38 @@ function Moto(world, mirror) {
     this.world = world;
     this.mirror = mirror ? -1 : 1;
     this.rider = new Rider(world, this);
-    this.dead = false;
+    this.isDead = false;
 
-    this.position = null;
+    this.position = new b2Vec2();
 
-    this.player_start = new b2Vec2(0, 0);
+    this.player_start = new b2Vec2();
 
     //this.body = null;
 }
 
 Moto.prototype = {
     constructor: Moto,
+    restart:function(ground){
+        console.log(this.isDead)
+        if (!this.isDead) return;
+         // destroy
+        this.destroy();
+        this.player_start = new b2Vec2();
+        this.position = new b2Vec2();
+
+        ground.update(this.position.x);
+
+        // reInit
+        this.init(true);
+    },
     kill:function(){
-        if (!this.dead){ 
-            this.dead = true;
+        if (!this.isDead){ 
+            this.isDead = true;
             this.rider.killJoint();
         }
     },
     destroy : function() {
-        this.isDestroy = true;
+        
         this.rider.destroy();
 
         this.world.DestroyJoint(this.left_revolute_joint);
@@ -138,6 +155,8 @@ Moto.prototype = {
 
         var i = this.bodyList.length;
         while(i--) this.world.DestroyBody(this[this.bodyList[i]]);
+
+        this.isDestroy = true;
 
         //this.body = null;
     },
@@ -155,19 +174,20 @@ Moto.prototype = {
         this.left_prismatic_joint = this.create_prismatic_joint(this.left_axle, Constants.left_suspension);
         this.right_prismatic_joint = this.create_prismatic_joint(this.right_axle, Constants.right_suspension);
 
-        console.log(this.right_prismatic_joint)
+        //console.log(this.right_prismatic_joint)
 
         this.rider.mirror = this.mirror;
         this.rider.init(direct);
         this.isDestroy = false;
+        this.isDead = false;
     },
     move : function(input) {
         var air_density, drag_force, object_penetration, squared_speed, v;
         if (!input.up && !input.down) {
             v = this.left_wheel.GetAngularVelocity();
-            this.left_wheel.ApplyTorque((Math.abs(v) >= 0.2 ? -v / 10 : 0));
+            this.left_wheel.ApplyTorque((Math.abs(v) >= 0.2 ? -v * 0.1 : 0));
             v = this.right_wheel.GetAngularVelocity();
-            this.right_wheel.ApplyTorque((Math.abs(v) >= 0.2 ? -v / 100 : 0));
+            this.right_wheel.ApplyTorque((Math.abs(v) >= 0.2 ? -v * 0.01 : 0));
         }
 
         this.changeLeft();
@@ -231,7 +251,7 @@ Moto.prototype = {
     },
   
     flip : function() {
-        if (!this.dead) {
+        if (!this.isDead) {
             flip(this);
         }
     },
@@ -270,16 +290,19 @@ function Rider(world, moto) {
     this.world = world;
     this.moto = moto;
     this.mirror = this.moto.mirror;
+    this.isDead = false;
+    //this.position = new b2Vec2();
     
 };
 
 Rider.prototype = {
     constructor: Rider,
     destroy : function() {
-
+        if(!this.isDead){
+            this.world.DestroyJoint(this.ankle_joint);
+            this.world.DestroyJoint(this.wrist_joint);
+        }
         this.world.DestroyJoint(this.neck_joint);
-        this.world.DestroyJoint(this.ankle_joint);
-        this.world.DestroyJoint(this.wrist_joint);
         this.world.DestroyJoint(this.knee_joint);
         this.world.DestroyJoint(this.elbow_joint);
         this.world.DestroyJoint(this.shoulder_joint);
@@ -307,13 +330,15 @@ Rider.prototype = {
         this.shoulder_joint = this.create_joint(Constants.shoulder, this.upper_arm, this.torso, true);
         this.hip_joint = this.create_joint(Constants.hip, this.upper_leg, this.torso, true, true, false);
         //console.log(this.knee_joint);
+
+        this.isDead = false;
     },
     position : function() {
         return this.moto.body.GetPosition();
     },
     eject : function() {
         var adjusted_force_vector, eject_angle, force_vector;
-        if (!this.moto.dead) {
+        if (!this.moto.isDead) {
             this.moto.kill();
             force_vector = new b2Vec2(  150.0 * this.mirror,  0 );
             eject_angle = this.mirror * this.moto.body.GetAngle() + Math.PI / 4.0;
@@ -323,6 +348,7 @@ Rider.prototype = {
         }
     },
     killJoint : function(){
+        this.isDead = true;
         this.world.DestroyJoint(this.ankle_joint);
         this.world.DestroyJoint(this.wrist_joint);
         this.shoulder_joint.EnableLimit( false );

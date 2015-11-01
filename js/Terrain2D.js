@@ -16,6 +16,7 @@ var Terrain2D = function(w, h, size, step, range) {
 	this.mh = this.h*0.5;
 	s = size || 30;
 	this.num = Math.round(this.step+this.w/this.step);
+    if(this.num > 128) this.num = 128;
 	this.scale = 1/s;
 	this.perlin = new Perlin();
 	this.points = new ARRAY32(this.num*2);

@@ -12,9 +12,11 @@ Math.rand = function (a, b) { return Math.lerp(a, b, Math.random()); }
 Math.randInt = function (a, b, n) { return Math.lerp(a, b, Math.random()).toFixed(n || 0)*1;}
 Math.degtorad = 0.0174532925199432957;
 Math.radtodeg = 57.295779513082320876;
-Math.PI90 = Math.PI*0.5;
-Math.PI270 = Math.PI+Math.PI90;
-Math.TwoPI = 2.0 * Math.PI;
+
+Math.PI     = 3.141592653589793;
+Math.TwoPI  = 6.283185307179586;
+Math.PI90   = 1.570796326794896;
+Math.PI270  = 4.712388980384689;
 
 Math.distance = function (v1, v2) {
     var dx = v1.x - v2.x;
@@ -225,6 +227,9 @@ b2PrismaticJoint.prototype.axis = null;
 // HILL CREATOR
 
 var Hill = function(o){
+
+    //!\\ max chaine vertices length is 256
+
     o = o || {}
     this.x = 0;
     this.y = 0;
@@ -253,9 +258,11 @@ var Hill = function(o){
         userData:o.userData || null
     }
 
+    //console.log(this.obj.vertices.length)
+
     this.ground = world.add(this.obj);
 
-    //console.log(this.ground)
+    
 
 }
 
@@ -269,7 +276,6 @@ Hill.prototype = {
             this.obj.mx -= this.zone;
             this.move(-this.zone/this.n);
         }
-
     },
     move:function(x,y){
         this.x += x || 0;

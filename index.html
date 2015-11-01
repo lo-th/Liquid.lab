@@ -99,7 +99,7 @@ var particleColors = [
 
 var world = null;
 
-var renderer, camera, target, scene, blobEffect, baseGroup, extraGroup;
+var renderer, camera, target, scene, blobEffect, baseGroup, extraGroup, gamepad;
 var vsize = {w:window.innerWidth, h:window.innerHeight}
 var particlesCloud;
 var liquidRender;
@@ -122,6 +122,8 @@ function printErrorMsg(msg) {
 
 function init() {
     var w = window.innerWidth/2;
+
+    gamepad = new Gamepad();
 
     camera = new THREE.PerspectiveCamera(70 , w / window.innerHeight , 1, 10000);
     target = new THREE.Vector3();
