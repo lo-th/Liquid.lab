@@ -277,6 +277,16 @@ Hill.prototype = {
             this.move(-this.zone/this.n);
         }
     },
+    redraw:function(x,y){
+        this.obj.mx = this.x-this.w*0.5;
+        this.x = x || 0;
+        this.y = y || 0;
+        this.obj.vertices = this.terrain.gen(this.x, this.y);
+
+        // update fixture
+        this.ground.DestroyFixture(this.ground.fixtures[0]);
+        this.ground.CreateFixtureFromDef(world.addFixture(this.obj));
+    },
     move:function(x,y){
         this.x += x || 0;
         this.y += y || 0;

@@ -133,7 +133,7 @@ Moto.prototype = {
         this.player_start = new b2Vec2();
         this.position = new b2Vec2();
 
-        ground.update(this.position.x);
+        ground.redraw(this.position.x);
 
         // reInit
         this.init(true);
