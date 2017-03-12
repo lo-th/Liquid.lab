@@ -31,6 +31,7 @@ function TestRamp() {
   circle.position.Set(-20, 33);
   circle.radius = 1.5;
   var pd = new b2ParticleGroupDef();
+  pd.color.Set(80, 140, 200, 130);
   pd.flags = b2_waterParticle;
   pd.shape = circle;
   particleSystem.CreateParticleGroup(pd);

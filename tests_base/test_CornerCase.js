@@ -54,6 +54,7 @@ function TestCornerCase() {
   shape.position.Set(0, 35);
   shape.radius = 12;
   var pd = new b2ParticleGroupDef;
+  pd.color.Set(80, 140, 200, 130);
   pd.shape = shape;
   particleSystem.CreateParticleGroup(pd);
 }

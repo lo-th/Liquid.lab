@@ -27,14 +27,30 @@ function TestAntiPointy() {
     ground.CreateFixtureFromShape(shape, 0);
   }
 
-  this.maxParticlesToCreate = 300;
+  //this.maxParticlesToCreate = 300;
   var psd = new b2ParticleSystemDef();
-  psd.radius = 0.025;
-  this.particleSystem = world.CreateParticleSystem(psd);
+  //psd.color.Set(80, 140, 200, 130);
+  psd.radius = 0.09;
+  var particleSystem = world.CreateParticleSystem(psd);
+
+
+
+
+  var shape = new b2CircleShape;
+  shape.position.Set(0, 40);
+  shape.radius = 2;
+  
+
+  var pd = new b2ParticleGroupDef();
+  //pd.position.Set(Math.rand(-10, 10), 40);
+  //pd.velocity.Set(0, -1);
+  pd.color.Set(80, 140, 200, 130);
+  pd.shape = shape;
+  particleSystem.CreateParticleGroup(pd);
 
 }
 
-TestAntiPointy.prototype.Step = function() {
+/*TestAntiPointy.prototype.Step = function() {
   Step();
   if (this.maxParticlesToCreate <= 0) {
     return;
@@ -44,5 +60,7 @@ TestAntiPointy.prototype.Step = function() {
   var pd = new b2ParticleDef();
   pd.position.Set(Math.rand(-10, 10), 40);
   pd.velocity.Set(0, -1);
+  pd.color.Set(80, 140, 200, 130);
   this.particleSystem.CreateParticle(pd);
-}
+
+}*/
