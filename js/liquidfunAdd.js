@@ -68,6 +68,10 @@ b2World.prototype.add = function(obj){
     } else {
         body.CreateFixtureFromDef( this.addFixture(obj) );
     }
+
+    if(obj.angularVelocity) body.SetAngularVelocity(obj.angularVelocity);
+    if(obj.linearVelocity) body.SetLinearVelocity(obj.linearVelocity);
+    
     return body;
 }
 
@@ -221,6 +225,8 @@ b2PrismaticJoint.prototype.type = 'prismatic';
 b2PrismaticJoint.prototype.def = null;
 b2PrismaticJoint.prototype.angle = null;
 b2PrismaticJoint.prototype.axis = null;
+
+
 
 
 

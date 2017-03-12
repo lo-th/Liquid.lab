@@ -20,10 +20,11 @@
 <script src="js/three.min.js"></script>
 <script src="js/Shaders.js"></script>
 <script src="js/blobShaders.js"></script>
+
 <script src="js/liquidfun.js"></script>
-<!--<script src="js/b2AreaJoint.js"></script>-->
 <script src="js/liquidfunAdd.js"></script>
 <script src="js/LiquidRender.js"></script>
+
 <script src="js/uil.min.js"></script>
 <script src="js/Terrain2D.js"></script>
 <script src="js/gamepad.js"></script>
@@ -58,14 +59,14 @@ menu.appendChild( subtitle );
 var editor = new CodeEditor(testSwitch);
 
 // test list
-var newlist = ['Planet', 'Moto', 'Segway', 'Break', 'Truck'];
+var newlist = ['Planet', 'Moto', 'Segway', 'Break', 'Truck', 'Pinball'];
 var liquidlist = ['DamBreak','Drawing','Elastic','Impulse','LiquidTimer','Particles','RigidParticles','Soup', 'SoupStirrer','Sparky','SurfaceTension','WaveMachine'];
 var baselist = ['AddPair', 'AntiPointy', 'ApplyForce', 'BodyTypes', 'Breakable', 'Bridge', 'Bullet', 'Cantilever', 'Car', 'Chain', 'CharacterCollision', 'CollisionFiltering', 'CompoundShapes', 'Confined', 'ConvexHull', 'ConveyorBelt', 'CornerCase', 'Dominos',  'DumpShell', 'EdgeShape', 'EdgeTest',  'Faucet', 'Gears', 'Hw', 'Maxwell', 'Mobile', 'MobileBalanced', 'MotorJoint',  'Pinball', 'Pointy', 'Prismatic', 'Pulley', 'Pyramid', 'Ramp', 'Revolute',  'Rope', 'RopeJoint', 'SensorTest', 'ShapeEditing', 'SliderCrank', 'SphereStack',  'TheoJansen', 'Tiles', 'Tumbler', 'VaryingFriction', 'VaryingRestitution', 'VerticalStack',  'Web',
 ];
 
-var demoList = new UIL.List({target:menu, callback:loadNew, name:' ', color:'no', size:100, list:newlist, pos:{left:'10px', top:'10px'}, simple:true, full:true, value:'ADVANCED' });
-var liquidList = new UIL.List({target:menu, callback:loadLiquid, name:' ', color:'no', size:110, list:liquidlist, pos:{left:'120px', top:'10px'}, simple:true, full:false, value:'LIQUID' });
-var basicList = new UIL.List({target:menu, callback:loadBase, name:' ', color:'no', size:130, list:baselist, pos:{left:'240px', top:'10px'}, simple:true, full:false, value:'BASIC' });
+var demoList = new UIL.List({target:menu, callback:loadNew, name:' ', color:'no', w:100, list:newlist, pos:{left:'10px', top:'10px'}, simple:true, full:true, value:'ADVANCED' });
+var liquidList = new UIL.List({target:menu, callback:loadLiquid, name:' ', color:'no', w:110, list:liquidlist, pos:{left:'120px', top:'10px'}, simple:true, full:true, value:'LIQUID' });
+var basicList = new UIL.List({target:menu, callback:loadBase, name:' ', color:'no', w:130, list:baselist, pos:{left:'240px', top:'10px'}, simple:true, full:true, value:'BASIC' });
 
 function loadBase(name){startTest=name; startFolder = 'tests_base'; editor.load('tests_base/test_'+name+'.js'); basicList.text('BASIC'); }
 function loadNew(name){startTest=name; startFolder = 'tests_new';  editor.load('tests_new/test_'+name+'.js'); demoList.text('ADVANCED'); }

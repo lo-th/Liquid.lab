@@ -26,7 +26,7 @@ function TestSparky() {
     bd.userData = 1;
     var body = world.CreateBody(bd);
     var shape = new b2CircleShape;
-    shape.position.Set(3.0 * RandomFloat(-1, 1),
+    shape.position.Set(3.0 * Math.rand(-1, 1),
     this.shapeHeightOffset + this.shapeOffset * i);
     shape.radius = 2;
     body.CreateFixtureFromShape(shape, 0.5);
@@ -107,7 +107,7 @@ TestSparky.prototype.AddVFX = function(p) {
     this.VFX[this.VFXIndex] = null;
   }
   this.VFX[this.VFXIndex] = new ParticleVFX(
-    this.particleSystem, p, RandomFloat(1, 2), RandomFloat(10, 20), RandomFloat(0.5, 1));
+    this.particleSystem, p, Math.rand(1, 2), Math.rand(10, 20), Math.rand(0.5, 1));
 
   if (++this.VFXIndex >= this.maxVFX) {
     this.VFXIndex = 0;
@@ -121,9 +121,9 @@ function ParticleVFX(ps, origin, size, speed, lifetime) {
 
   var pd = new b2ParticleGroupDef;
   pd.shape = shape;
-  this.origColor = new b2ParticleColor(RandomFloat(0, 256),
-    RandomFloat(0,256),
-    RandomFloat(0,256), 255);
+  this.origColor = new b2ParticleColor(Math.rand(0, 256),
+    Math.rand(0,256),
+    Math.rand(0,256), 255);
   pd.color = this.origColor;
   pd.flags = b2_powderParticle;
   this.particleSystem = ps;
